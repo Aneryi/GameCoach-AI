@@ -1,0 +1,11 @@
+{
+  "player_id": "player_001",
+  "favorite_heroes": ["后羿", "狄仁杰"],
+  "main_roles": ["射手"],
+  "weaknesses": ["团战意识差", "中期容易掉点"],
+  "goals": ["上钻石"],
+  "preferred_playstyle": "稳健发育型",
+  "rank": "铂金 I",
+  "updated_at": "2026-06-09T20:00:00+08:00"
+}
+

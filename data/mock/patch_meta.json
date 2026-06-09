@@ -1,0 +1,16 @@
+{
+  "moba": {
+    "latest": {
+      "patch": "2026.06-demo",
+      "roles": {
+        "射手": {
+          "strong_heroes": ["狄仁杰", "孙尚香", "戈娅"],
+          "nerfed_heroes": ["后羿"],
+          "buffed_items": ["逐日之弓"],
+          "meta_summary": "当前 Demo 版本射手更重视自保、中期参团和稳定输出。"
+        }
+      }
+    }
+  }
+}
+

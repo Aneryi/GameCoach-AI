@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gamecoach-ai"
+version = "0.1.0"
+description = "GameCoach AI: a LangGraph-based game growth coach agent."
+requires-python = ">=3.11,<3.13"
+dependencies = [
+  "langgraph>=0.2.60",
+  "langchain-core>=0.3.0",
+  "langchain-openai>=0.2.0",
+  "python-dotenv>=1.0.1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "langgraph-cli[inmem]>=0.4.0",
+  "pytest>=8.0.0",
+  "ruff>=0.6.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

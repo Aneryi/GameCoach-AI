@@ -1,0 +1,33 @@
+{
+  "狄仁杰": {
+    "role": "射手",
+    "difficulty": "medium",
+    "strengths": ["持续输出", "解控", "对线稳定"],
+    "weaknesses": ["缺少位移", "怕强突进"]
+  },
+  "孙尚香": {
+    "role": "射手",
+    "difficulty": "medium",
+    "strengths": ["爆发高", "位移灵活", "中后期强"],
+    "weaknesses": ["前期需要发育", "失误成本较高"]
+  },
+  "戈娅": {
+    "role": "射手",
+    "difficulty": "medium",
+    "strengths": ["拉扯强", "机动性高", "适合中期团战"],
+    "weaknesses": ["需要熟悉节奏", "新手容易输出断档"]
+  },
+  "后羿": {
+    "role": "射手",
+    "difficulty": "low",
+    "strengths": ["持续输出强", "开团能力稳定"],
+    "weaknesses": ["没有位移", "容易被突进针对"]
+  },
+  "伽罗": {
+    "role": "射手",
+    "difficulty": "medium",
+    "strengths": ["后期输出强", "射程优势明显"],
+    "weaknesses": ["前期弱", "需要队友保护"]
+  }
+}
+
