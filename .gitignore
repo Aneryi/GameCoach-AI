@@ -6,4 +6,7 @@ __pycache__/
 .env
 *.egg-info/
 .langgraph_api/
+data/vector_store/
+data/memory/*.json
+!data/memory/player_001.json
 
