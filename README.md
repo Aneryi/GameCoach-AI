@@ -92,7 +92,7 @@ LangSmith / Evaluation
 ```json
 {
   "favorite_heroes": ["后羿", "狄仁杰"],
-  "main_roles": ["射手"],
+  "main_roles": ["damage"],
   "weaknesses": ["团战意识差", "中期容易掉点"],
   "goals": ["上钻石"]
 }
@@ -128,13 +128,14 @@ Day 7: 综合复盘
 ## 技术栈
 
 - Python 3.11
-- LangGraph
-- LangChain
-- LangSmith
-- Pydantic
-- FAISS 或 Chroma
-- FastAPI
-- Pytest
+- LangGraph (条件路由 DAG)
+- LangChain (LangChain Tool 封装)
+- LangSmith (Trace 监控)
+- Pydantic (结构化输出校验)
+- FAISS (向量检索)
+- DashScope (阿里云 text-embedding-v2)
+- FastAPI (REST API 服务)
+- Pytest (17 个测试)
 
 ## 设计亮点
 
@@ -144,7 +145,7 @@ Day 7: 综合复盘
 
 ### Strategy 与 Build 解耦
 
-Strategy 回答"怎么打"（站位、时机、节奏），Build 回答"带什么"（装备、符文、构筑）。两者是不同层面的建议，互补而非重复。在无装备系统的游戏中（如部分 FPS），Build Agent 可被跳过，Strategy 独立工作。
+Strategy 回答"怎么打"（站位、时机、节奏），Build 回答"带什么"（装备、构筑）。两者是不同层面的建议，互补而非重复。在无装备系统的游戏中，Build Agent 可被跳过，Strategy 独立工作。
 
 ### Memory 双层架构
 
@@ -167,6 +168,25 @@ Memory 分为 `confirmed`（高置信，参与决策）和 `pending`（暂存观
 LLM 只收到生成建议所需的数据（英雄偏好、战绩指标、段位），不包含可关联到真人的标识符。每个外部接口（LLM API、LangSmith、日志）在数据流出前做 PII 清洗。
 
 详细设计请查看 [SPEC.md](./SPEC.md)。
+
+## 快速启动
+
+```bash
+# 安装依赖
+pip install -e .[dev]
+
+# CLI 模式：运行默认演示
+python -m gamecoach.main
+
+# CLI 模式：自定义问题
+python -m gamecoach.main --message "我适合练什么英雄？"
+
+# Web API 模式：启动服务
+uvicorn gamecoach.api:app --host 127.0.0.1 --port 8000
+
+# 然后访问 http://127.0.0.1:8000/docs 查看 Swagger UI
+# POST /coach {"user_message": "我最近胜率很低，怎么上分？"}
+```
 
 ## 文档
 

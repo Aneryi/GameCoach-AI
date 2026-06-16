@@ -50,6 +50,8 @@ def _build_new_index(force: bool = False) -> FAISS:
 
     chunks = _split_documents(docs)
     embeddings = get_embeddings()
+    if embeddings is None:
+        raise RuntimeError("Embedding 模型不可用（DASHSCOPE_API_KEY 未配置）")
     vectorstore = FAISS.from_documents(chunks, embeddings)
 
     # 持久化
@@ -66,6 +68,8 @@ def _load_existing_index() -> FAISS | None:
         return None
     try:
         embeddings = get_embeddings()
+        if embeddings is None:
+            return None
         vectorstore = FAISS.load_local(
             str(VECTOR_STORE_DIR),
             embeddings,

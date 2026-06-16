@@ -3,7 +3,7 @@ from typing import Any, Literal, TypedDict
 
 class PlayerMemory(TypedDict, total=False):
     player_id: str
-    favorite_heroes: list[str]
+    favorite_characters: list[str]
     main_roles: list[str]
     weaknesses: list[str]
     goals: list[str]
@@ -16,7 +16,7 @@ class PlannedTask(TypedDict):
     task_id: str
     task_type: Literal[
         "match_analysis",
-        "hero_recommendation",
+        "character_recommendation",
         "build_recommendation",
         "strategy_generation",
         "rag_lookup",
@@ -33,7 +33,6 @@ class GameCoachState(TypedDict, total=False):
     user_message: str
     normalized_message: str
     player_id: str
-    game: str
     intent: str
 
     # Planner 输出
@@ -49,8 +48,8 @@ class GameCoachState(TypedDict, total=False):
     match_data: dict[str, Any]
     match_analysis: dict[str, Any]
 
-    # 英雄推荐
-    hero_recommendations: list[dict[str, Any]]
+    # 角色推荐
+    character_recommendations: list[dict[str, Any]]
 
     # 出装推荐
     build_recommendations: list[dict[str, Any]]

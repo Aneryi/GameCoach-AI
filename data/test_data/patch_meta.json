@@ -1,0 +1,15 @@
+{
+  "game": {
+    "latest": {
+      "patch": "2026.06-demo",
+      "roles": {
+        "damage": {
+          "strong_characters": ["Alpha", "Bravo", "Charlie"],
+          "nerfed_characters": ["Delta"],
+          "buffed_items": ["Long_Range_Bow"],
+          "meta_summary": "Current meta favors self-sufficiency and mid-game teamfight presence for damage role."
+        }
+      }
+    }
+  }
+}

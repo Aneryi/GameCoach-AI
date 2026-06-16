@@ -1,8 +1,4 @@
-"""GameCoach AI 主入口。
-
-支持 CLI 直接运行和参数配置。
-无 LLM Key 时自动使用 fallback 模式。
-"""
+"""GameCoach AI CLI entry point."""
 
 from __future__ import annotations
 
@@ -15,141 +11,60 @@ from gamecoach.graph.workflow import graph
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
-
-# ── 预设演示场景 ──
-
 DEMO_SCENARIOS = [
-    {
-        "name": "上分求助",
-        "input": {
-            "user_message": "我最近胜率很低，玩射手总是团战暴毙，怎么上分？",
-            "player_id": "player_001",
-            "game": "moba",
-        },
-    },
-    {
-        "name": "英雄推荐",
-        "input": {
-            "user_message": "当前版本有什么强势英雄适合我练？",
-            "player_id": "player_001",
-            "game": "moba",
-        },
-    },
-    {
-        "name": "出装建议",
-        "input": {
-            "user_message": "狄仁杰出什么装备比较好？",
-            "player_id": "player_001",
-            "game": "moba",
-        },
-    },
-    {
-        "name": "训练计划",
-        "input": {
-            "user_message": "帮我制定一个 7 天上分训练计划。",
-            "player_id": "player_001",
-            "game": "moba",
-        },
-    },
+    {"name": "Rank climbing help", "input": {"user_message": "My win rate has been really low lately and I keep dying in teamfights. How can I climb?", "player_id": "player_001"}},
+    {"name": "Character recommendation", "input": {"user_message": "What characters are strong in the current meta for me to learn?", "player_id": "player_001"}},
+    {"name": "Build advice", "input": {"user_message": "What's the best build for Alpha?", "player_id": "player_001"}},
+    {"name": "Training plan", "input": {"user_message": "Create a 7-day training plan to help me improve.", "player_id": "player_001"}},
 ]
 
 
-def run_demo(scenario_index: int = 0):
-    """运行单个演示场景。"""
-    if scenario_index >= len(DEMO_SCENARIOS):
-        logger.error("场景序号 %d 超出范围 (0-%d)", scenario_index, len(DEMO_SCENARIOS) - 1)
-        return
-
-    scenario = DEMO_SCENARIOS[scenario_index]
-    logger.info("运行场景: %s", scenario["name"])
-    _run_and_print(scenario["input"])
-
-
-def run_all_demos():
-    """运行所有演示场景。"""
-    for i, scenario in enumerate(DEMO_SCENARIOS):
-        print(f"\n{'=' * 60}")
-        print(f"场景 {i + 1}/{len(DEMO_SCENARIOS)}: {scenario['name']}")
-        print(f"{'=' * 60}")
-        _run_and_print(scenario["input"])
-
-
-def run_custom(user_message: str, player_id: str = "player_001", game: str = "moba"):
-    """运行自定义输入。"""
-    _run_and_print(
-        {
-            "user_message": user_message,
-            "player_id": player_id,
-            "game": game,
-        }
-    )
-
-
 def _run_and_print(graph_input: dict):
-    """执行 Graph 并打印结果。"""
-    # 检查 LLM 状态
     llm = get_chat_model()
     if llm is None:
-        logger.warning("[!] LLM Key 未配置，将使用 fallback 规则模式。")
+        logger.warning("[!] LLM key not configured, using fallback mode.")
 
     try:
         result = graph.invoke(graph_input)
     except Exception:
-        logger.exception("Graph 执行失败")
+        logger.exception("Graph execution failed")
         return
 
-    routing_path = result.get("routing_decisions", {}).get("routing_path", "未知")
-    task_count = result["metrics"].get("planner_task_count", 0)
-    rag_hits = result["metrics"].get("rag_hit_count", 0)
-
-    print(f"\n[执行路径] {routing_path}")
-    print(f"[任务数] {task_count}")
-    print(f"[RAG 命中] {rag_hits} 条")
+    routing_path = result.get("routing_decisions", {}).get("routing_path", "unknown")
+    print(f"\n[Path] {routing_path}")
+    print(f"[Tasks] {result['metrics'].get('planner_task_count', 0)}")
+    print(f"[RAG hits] {result['metrics'].get('rag_hit_count', 0)}")
     print()
-
-    print(result.get("final_response", "未能生成回复。"))
-
-    # 打印评估摘要
+    print(result.get("final_response", "No response generated."))
     metrics = result.get("metrics", {})
-    print(f"\n--- 评估指标 ---")
-    print(f"  路由路径: {metrics.get('routing_path', 'N/A')}")
-    print(f"  降级节点: {len(result.get('degraded_nodes', []))}")
-    print(f"  回复长度: {metrics.get('response_length', 0)} 字符")
+    print(f"\n--- Metrics ---")
+    print(f"  Path: {metrics.get('routing_path', 'N/A')}")
+    print(f"  Degraded: {len(result.get('degraded_nodes', []))}")
+    print(f"  Response length: {metrics.get('response_length', 0)} chars")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="GameCoach AI - 游戏成长教练")
-    parser.add_argument(
-        "--message", "-m", type=str, help="用户问题（中文）"
-    )
-    parser.add_argument(
-        "--player-id", type=str, default="player_001", help="玩家 ID"
-    )
-    parser.add_argument(
-        "--game", type=str, default="moba", help="游戏类型"
-    )
-    parser.add_argument(
-        "--demo", type=int, default=None, help="运行预设演示场景 (0-3)"
-    )
-    parser.add_argument(
-        "--all-demos", action="store_true", help="运行全部演示场景"
-    )
-
+    parser = argparse.ArgumentParser(description="GameCoach AI")
+    parser.add_argument("--message", "-m", type=str, help="Player question")
+    parser.add_argument("--player-id", type=str, default="player_001")
+    parser.add_argument("--demo", type=int, default=None, help="Run demo scenario (0-3)")
+    parser.add_argument("--all-demos", action="store_true")
     args = parser.parse_args()
 
     if args.all_demos:
-        run_all_demos()
+        for i, s in enumerate(DEMO_SCENARIOS):
+            print(f"\n{'='*60}\nScenario {i+1}/{len(DEMO_SCENARIOS)}: {s['name']}\n{'='*60}")
+            _run_and_print(s["input"])
     elif args.demo is not None:
-        run_demo(args.demo)
+        if args.demo >= len(DEMO_SCENARIOS):
+            logger.error("Demo index %d out of range (0-%d)", args.demo, len(DEMO_SCENARIOS)-1)
+            return
+        _run_and_print(DEMO_SCENARIOS[args.demo]["input"])
     elif args.message:
-        run_custom(args.message, args.player_id, args.game)
+        _run_and_print({"user_message": args.message, "player_id": args.player_id})
     else:
-        # 默认运行第一个演示
-        logger.info("未指定参数，运行默认演示场景。")
-        logger.info("用法: python -m gamecoach.main --message '你的问题'")
-        logger.info("用法: python -m gamecoach.main --demo 0")
-        logger.info("用法: python -m gamecoach.main --all-demos\n")
-        run_demo(0)
+        logger.info("No arguments. Usage: python -m gamecoach.main --message 'your question'")
+        _run_and_print(DEMO_SCENARIOS[0]["input"])
 
 
 if __name__ == "__main__":

@@ -1,0 +1,13 @@
+{
+  "Basic_Boots": {"category": "boots", "stat": "Attack Speed +25%", "price": 710, "role_fit": ["damage"], "note": "Best for auto-attack characters"},
+  "Tenacity_Boots": {"category": "boots", "stat": "Tenacity +35%", "price": 710, "role_fit": ["all"], "note": "Use against heavy CC teams"},
+  "Core_Item": {"category": "attack", "stat": "AS+30%, AD+60, Lifesteal+10%", "price": 2160, "role_fit": ["damage"], "note": "Percent-health passive, strong vs tanks"},
+  "Crit_Core": {"category": "attack", "stat": "AD+110, Crit+25%", "price": 2140, "role_fit": ["damage", "assassin"], "note": "Critical strike build core"},
+  "Pen_Item": {"category": "attack", "stat": "AD+50, AS+35%, Crit+15%", "price": 3400, "role_fit": ["damage"], "note": "Ranged-only pen item, late game must-buy"},
+  "Range_Bow": {"category": "attack", "stat": "AS+25%, Crit+15%", "price": 2100, "role_fit": ["damage"], "note": "Active: increases range, currently buffed"},
+  "Burst_Item": {"category": "attack", "stat": "AD+80, Crit+20%", "price": 2100, "role_fit": ["damage", "assassin"], "note": "Skill-enhanced auto core item"},
+  "Giant_Slayer": {"category": "attack", "stat": "AD+180", "price": 2950, "role_fit": ["damage", "assassin"], "note": "Bonus damage vs targets below 50% HP"},
+  "Magic_Resist": {"category": "defense", "stat": "MR+320, Shield", "price": 2120, "role_fit": ["all"], "note": "Must-buy vs heavy magic damage"},
+  "Armor_Item": {"category": "defense", "stat": "Armor+270, HP+1200", "price": 2180, "role_fit": ["all"], "note": "Slows attackers, counters physical burst"},
+  "Revive_Item": {"category": "defense", "stat": "Revive once", "price": 2100, "role_fit": ["all"], "note": "Late-game safety net, one use per match"}
+}

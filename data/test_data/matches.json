@@ -1,0 +1,24 @@
+{
+  "player_001": [
+    {"match_id": "m_001", "result": "loss", "character": "Alpha", "role": "damage", "kills": 4, "deaths": 8, "assists": 6, "score": 9800, "damage": 62000, "teamfight_participation": 0.46, "duration_minutes": 18},
+    {"match_id": "m_002", "result": "loss", "character": "Bravo", "role": "damage", "kills": 6, "deaths": 7, "assists": 5, "score": 10200, "damage": 71000, "teamfight_participation": 0.52, "duration_minutes": 22},
+    {"match_id": "m_003", "result": "win", "character": "Alpha", "role": "damage", "kills": 10, "deaths": 3, "assists": 8, "score": 14500, "damage": 89000, "teamfight_participation": 0.68, "duration_minutes": 25},
+    {"match_id": "m_004", "result": "loss", "character": "Delta", "role": "damage", "kills": 3, "deaths": 9, "assists": 4, "score": 7200, "damage": 48000, "teamfight_participation": 0.38, "duration_minutes": 15},
+    {"match_id": "m_005", "result": "win", "character": "Alpha", "role": "damage", "kills": 8, "deaths": 4, "assists": 10, "score": 13200, "damage": 81000, "teamfight_participation": 0.62, "duration_minutes": 28},
+    {"match_id": "m_006", "result": "loss", "character": "Echo", "role": "damage", "kills": 2, "deaths": 7, "assists": 3, "score": 6500, "damage": 52000, "teamfight_participation": 0.41, "duration_minutes": 14},
+    {"match_id": "m_007", "result": "loss", "character": "Alpha", "role": "damage", "kills": 5, "deaths": 6, "assists": 7, "score": 11000, "damage": 64000, "teamfight_participation": 0.55, "duration_minutes": 20},
+    {"match_id": "m_008", "result": "win", "character": "Bravo", "role": "damage", "kills": 12, "deaths": 2, "assists": 9, "score": 15800, "damage": 95000, "teamfight_participation": 0.72, "duration_minutes": 24},
+    {"match_id": "m_009", "result": "loss", "character": "Alpha", "role": "damage", "kills": 3, "deaths": 8, "assists": 5, "score": 7800, "damage": 51000, "teamfight_participation": 0.44, "duration_minutes": 16},
+    {"match_id": "m_010", "result": "loss", "character": "Charlie", "role": "damage", "kills": 7, "deaths": 6, "assists": 8, "score": 12100, "damage": 73000, "teamfight_participation": 0.58, "duration_minutes": 26},
+    {"match_id": "m_011", "result": "win", "character": "Alpha", "role": "damage", "kills": 9, "deaths": 3, "assists": 11, "score": 14800, "damage": 87000, "teamfight_participation": 0.65, "duration_minutes": 23},
+    {"match_id": "m_012", "result": "loss", "character": "Delta", "role": "damage", "kills": 4, "deaths": 7, "assists": 6, "score": 9100, "damage": 55000, "teamfight_participation": 0.49, "duration_minutes": 19},
+    {"match_id": "m_013", "result": "loss", "character": "Alpha", "role": "damage", "kills": 6, "deaths": 5, "assists": 5, "score": 10500, "damage": 67000, "teamfight_participation": 0.53, "duration_minutes": 21},
+    {"match_id": "m_014", "result": "win", "character": "Bravo", "role": "damage", "kills": 11, "deaths": 4, "assists": 7, "score": 13900, "damage": 90000, "teamfight_participation": 0.69, "duration_minutes": 27},
+    {"match_id": "m_015", "result": "loss", "character": "Echo", "role": "damage", "kills": 1, "deaths": 9, "assists": 2, "score": 5400, "damage": 38000, "teamfight_participation": 0.32, "duration_minutes": 13},
+    {"match_id": "m_016", "result": "win", "character": "Alpha", "role": "damage", "kills": 10, "deaths": 2, "assists": 9, "score": 15200, "damage": 86000, "teamfight_participation": 0.71, "duration_minutes": 22},
+    {"match_id": "m_017", "result": "loss", "character": "Delta", "role": "damage", "kills": 5, "deaths": 7, "assists": 6, "score": 9600, "damage": 59000, "teamfight_participation": 0.50, "duration_minutes": 17},
+    {"match_id": "m_018", "result": "loss", "character": "Alpha", "role": "damage", "kills": 3, "deaths": 6, "assists": 4, "score": 7600, "damage": 47000, "teamfight_participation": 0.42, "duration_minutes": 15},
+    {"match_id": "m_019", "result": "win", "character": "Bravo", "role": "damage", "kills": 8, "deaths": 3, "assists": 10, "score": 13500, "damage": 82000, "teamfight_participation": 0.66, "duration_minutes": 20},
+    {"match_id": "m_020", "result": "loss", "character": "Charlie", "role": "damage", "kills": 6, "deaths": 8, "assists": 7, "score": 10800, "damage": 68000, "teamfight_participation": 0.56, "duration_minutes": 24}
+  ]
+}

@@ -1,11 +1,42 @@
-"""评估指标计算。
+"""评估指标计算与 LangSmith 上报。
 
-从 GameCoachState 中提取关键质量指标，评估本次 Agent 执行的质量。
+从 GameCoachState 中提取关键质量指标，评估本次 Agent 执行的质量，
+并通过 LangSmith SDK 上报自定义指标（如果 API Key 已配置）。
 """
 
 from __future__ import annotations
 
+import logging
+import os
+
 from gamecoach.graph.state import GameCoachState
+
+logger = logging.getLogger(__name__)
+
+# LangSmith client 惰性初始化
+_langsmith_client = None
+
+
+def _get_langsmith_client():
+    """获取 LangSmith client 实例。
+
+    如果 LANGCHAIN_API_KEY 未配置则返回 None，所有上报操作静默跳过。
+    """
+    global _langsmith_client
+    if _langsmith_client is None:
+        api_key = os.getenv("LANGCHAIN_API_KEY")
+        if not api_key:
+            return None
+        try:
+            from langsmith import Client
+            _langsmith_client = Client(api_key=api_key)
+        except ImportError:
+            logger.debug("langsmith SDK 未安装，跳过 LangSmith 上报")
+            return None
+        except Exception:
+            logger.debug("LangSmith client 初始化失败")
+            return None
+    return _langsmith_client
 
 
 def evaluate_run(state: GameCoachState) -> dict:
@@ -22,7 +53,6 @@ def evaluate_run(state: GameCoachState) -> dict:
     errors = state.get("errors", [])
     degraded = state.get("degraded_nodes", [])
 
-    # 基本指标
     planned_count = len(state.get("planned_tasks", []))
     executed_count = len([v for v in routing.values() if v in ("execute", "fixed")])
 
@@ -43,15 +73,63 @@ def evaluate_run(state: GameCoachState) -> dict:
         },
         "output_quality": {
             "response_length": metrics.get("response_length", 0),
-            "has_conclusion": "结论" in state.get("final_response", ""),
-            "has_data_evidence": "胜率" in state.get("final_response", ""),
-            "has_action_items": "优先改进" in state.get("final_response", "")
-            or "改进" in state.get("final_response", ""),
         },
         "health": _compute_health(planned_count, executed_count, len(errors), len(degraded)),
     }
 
+    # 尝试上报到 LangSmith
+    _push_to_langsmith(report, state)
+
     return report
+
+
+def _push_to_langsmith(report: dict, state: GameCoachState) -> None:
+    """将评估指标上报到 LangSmith。
+
+    通过 LangSmith SDK 创建自定义 feedback，
+    在 LangSmith UI 中可查看每次请求的质量趋势。
+    """
+    client = _get_langsmith_client()
+    if client is None:
+        return
+
+    project = os.getenv("LANGCHAIN_PROJECT", "gamecoach-ai")
+
+    try:
+        client.create_feedback(
+            key="planner_task_count",
+            score=report["execution"]["planned_tasks"],
+            comment=f"任务数: {report['execution']['planned_tasks']}",
+            project_name=project,
+        )
+        client.create_feedback(
+            key="degraded_nodes",
+            score=float(report["execution"]["degraded_nodes"]),
+            comment=f"降级节点: {report['execution']['degraded_nodes']}",
+            project_name=project,
+        )
+        client.create_feedback(
+            key="rag_hits",
+            score=float(report["data_quality"]["rag_hits"]),
+            comment=f"RAG 命中: {report['data_quality']['rag_hits']}",
+            project_name=project,
+        )
+        client.create_feedback(
+            key="response_length",
+            score=float(report["output_quality"]["response_length"]),
+            comment=f"回复长度: {report['output_quality']['response_length']}",
+            project_name=project,
+        )
+        health_score = 1.0 if "OK" in report["health"] else 0.5
+        client.create_feedback(
+            key="health",
+            score=health_score,
+            comment=report["health"],
+            project_name=project,
+        )
+        logger.debug("LangSmith 上报完成 (project=%s)", project)
+    except Exception:
+        logger.debug("LangSmith 上报失败（非致命）")
 
 
 def _compute_health(

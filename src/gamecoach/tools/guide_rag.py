@@ -32,7 +32,7 @@ def guide_rag_tool(query: str, top_k: int = 5) -> dict[str, Any]:
     版本强势打法、地图资源控制等攻略性问题。
 
     Args:
-        query: 自然语言搜索查询，例如 "射手团战站位技巧"。
+        query: 自然语言搜索查询，例如 "teamfight positioning tips"。
         top_k: 返回结果数量，默认 5。
 
     Returns:

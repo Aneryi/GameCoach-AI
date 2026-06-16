@@ -1,0 +1,32 @@
+{
+  "Alpha": {
+    "role": "damage",
+    "difficulty": "medium",
+    "strengths": ["consistent output", "self-cleanse", "stable laning"],
+    "weaknesses": ["low mobility", "vulnerable to burst"]
+  },
+  "Bravo": {
+    "role": "damage",
+    "difficulty": "medium",
+    "strengths": ["high burst", "agile", "strong mid-late game"],
+    "weaknesses": ["needs early farm", "punishing if misplayed"]
+  },
+  "Charlie": {
+    "role": "damage",
+    "difficulty": "medium",
+    "strengths": ["high mobility", "strong skirmishing"],
+    "weaknesses": ["rhythm-dependent", "output gaps for new players"]
+  },
+  "Delta": {
+    "role": "damage",
+    "difficulty": "low",
+    "strengths": ["high sustained damage", "reliable initiation"],
+    "weaknesses": ["no mobility", "vulnerable to dive"]
+  },
+  "Echo": {
+    "role": "damage",
+    "difficulty": "medium",
+    "strengths": ["strong late game", "range advantage"],
+    "weaknesses": ["weak early", "needs team protection"]
+  }
+}

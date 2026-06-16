@@ -1,0 +1,22 @@
+{
+  "player_id": "player_001",
+  "favorite_characters": [
+    "Delta",
+    "Alpha"
+  ],
+  "main_roles": [
+    "damage"
+  ],
+  "weaknesses": [
+    "poor teamfight positioning",
+    "excessive mid-game deaths",
+    "Win rate below 50% – narrow character pool and reduce high-risk plays.",
+    "Teamfight participation low – improve mid-game rotation timing."
+  ],
+  "goals": [
+    "reach Diamond rank"
+  ],
+  "preferred_playstyle": "conservative farming",
+  "rank": "Platinum I",
+  "updated_at": "2026-06-16T22:25:31.183610+08:00"
+}

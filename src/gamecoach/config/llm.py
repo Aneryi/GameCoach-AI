@@ -9,7 +9,7 @@ from gamecoach.config.settings import get_settings
 
 logger = logging.getLogger(__name__)
 
-_HF_EMBEDDINGS: Optional[object] = None
+_DASH_SCOPE_EMBEDDINGS: Optional[object] = None
 
 
 def get_chat_model(
@@ -36,21 +36,25 @@ def get_chat_model(
 
 
 def get_embeddings():
-    """获取本地 HuggingFace embedding 模型。
+    """获取阿里 DashScope embedding 模型。
 
-    使用 all-MiniLM-L6-v2 做本地 embedding，不依赖外部 API。
-    模型首次加载时会自动下载（约 80MB），后续调用复用缓存的实例。
+    使用 text-embedding-v2，API Key 从环境变量 DASHSCOPE_API_KEY 读取。
+    实例会被缓存复用，避免重复创建。
 
     Returns:
-        HuggingFaceEmbeddings 实例。
+        DashScopeEmbeddings 实例。如果 DASHSCOPE_API_KEY 未配置则返回 None。
     """
-    global _HF_EMBEDDINGS
-    if _HF_EMBEDDINGS is None:
-        from langchain_community.embeddings import HuggingFaceEmbeddings
+    global _DASH_SCOPE_EMBEDDINGS
+    if _DASH_SCOPE_EMBEDDINGS is None:
+        from langchain_community.embeddings import DashScopeEmbeddings
 
-        _HF_EMBEDDINGS = HuggingFaceEmbeddings(
-            model_name="all-MiniLM-L6-v2",
-            model_kwargs={"device": "cpu"},
-            encode_kwargs={"normalize_embeddings": True},
+        settings = get_settings()
+        if not settings.dashscope_api_key:
+            logger.warning("DASHSCOPE_API_KEY 未配置，RAG 检索将返回空结果。")
+            return None
+
+        _DASH_SCOPE_EMBEDDINGS = DashScopeEmbeddings(
+            model="text-embedding-v2",
+            dashscope_api_key=settings.dashscope_api_key,
         )
-    return _HF_EMBEDDINGS
+    return _DASH_SCOPE_EMBEDDINGS
