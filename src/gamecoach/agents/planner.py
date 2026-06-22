@@ -105,6 +105,7 @@ Rules:
 6. Training plan requests need training_plan
 7. Each task_type appears at most once
 8. Not all tasks are needed for every question
+9. Respond in the same language as the user's input
 
 Output ONLY this JSON format:
 {{

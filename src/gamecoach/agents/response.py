@@ -13,6 +13,10 @@ from gamecoach.graph.state import GameCoachState
 logger = logging.getLogger(__name__)
 
 
+def _is_chinese(text: str) -> bool:
+    return any('一' <= c <= '鿿' for c in text)
+
+
 def _fallback_response(state: GameCoachState) -> GameCoachState:
     metrics = state.get("match_analysis", {}).get("metrics", {})
     recommendations = state.get("character_recommendations", [])
@@ -21,7 +25,9 @@ def _fallback_response(state: GameCoachState) -> GameCoachState:
     rag = state.get("rag_context", [])
     errors = state.get("errors", [])
     degraded = state.get("degraded_nodes", [])
+    user_msg = state.get("normalized_message", state.get("user_message", ""))
 
+    cn = _is_chinese(user_msg)
     win_rate = metrics.get("win_rate", 0) if metrics else 0
     avg_kda = metrics.get("avg_kda", 0) if metrics else 0
     avg_deaths = metrics.get("avg_deaths", 0) if metrics else 0
@@ -47,15 +53,39 @@ def _fallback_response(state: GameCoachState) -> GameCoachState:
 
     degraded_note = ""
     if degraded:
-        degraded_note = "\n[!] Note: Some modules skipped — " + ", ".join(degraded) + "\n"
+        if cn:
+            degraded_note = "\n[!] 以下模块已跳过: " + ", ".join(degraded) + "\n"
+        else:
+            degraded_note = "\n[!] Note: Some modules skipped — " + ", ".join(degraded) + "\n"
 
     rag_note = ""
     if rag:
-        rag_note = "\n[Reference]\n" + "\n".join(
+        prefix = "[参考攻略]" if cn else "[Reference]"
+        rag_note = f"\n{prefix}\n" + "\n".join(
             f"- {d.get('title', d.get('source', 'Guide'))}" for d in rag[:3]
         )
 
-    final_response = f"""Conclusion:
+    if cn:
+        final_response = f"""结论：
+{strategy.get('diagnosis', '主要问题是死亡过多，需要降低中期风险。')}
+
+数据依据：
+- 最近胜率：{win_rate * 100:.0f}%
+- 平均 KDA：{avg_kda}
+- 平均死亡：{avg_deaths}
+- 参团率：{participation * 100:.0f}%
+{degraded_note}
+优先改进：
+1. {actions[0] if len(actions) > 0 else '改善站位'}
+2. {actions[1] if len(actions) > 1 else '固定角色池'}
+3. {actions[2] if len(actions) > 2 else '提高参团率'}"""
+
+        if char_lines:
+            final_response += f"\n\n推荐角色：\n{char_lines}"
+        if task_lines:
+            final_response += f"\n\n{plan.get('duration_days', 3)} 天训练计划：\n{task_lines}"
+    else:
+        final_response = f"""Conclusion:
 {strategy.get('diagnosis', 'Your main issue is excessive deaths; reduce mid-game risk.')}
 
 Data:
@@ -69,15 +99,13 @@ Priority improvements:
 2. {actions[1] if len(actions) > 1 else 'Fix character pool'}
 3. {actions[2] if len(actions) > 2 else 'Increase teamfight participation'}"""
 
-    if char_lines:
-        final_response += f"\n\nRecommended characters:\n{char_lines}"
-
-    if task_lines:
-        final_response += f"\n\n{plan.get('duration_days', 3)}-day training plan:\n{task_lines}"
+        if char_lines:
+            final_response += f"\n\nRecommended characters:\n{char_lines}"
+        if task_lines:
+            final_response += f"\n\n{plan.get('duration_days', 3)}-day training plan:\n{task_lines}"
 
     if rag_note:
         final_response += f"\n{rag_note}"
-
     if errors:
         final_response += f"\n\n[!] Issues: {'; '.join(errors)}"
 
@@ -144,7 +172,8 @@ Requirements:
 6. If guides are referenced, cite sources
 7. Coach tone: direct but encouraging, practical
 8. If data is missing, be honest without fabricating
-9. Keep under 500 words"""
+9. Keep under 500 words
+10. Respond in the same language as the player's question"""
 
     try:
         result = llm.invoke(prompt)
