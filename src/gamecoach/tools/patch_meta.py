@@ -1,6 +1,9 @@
-"""Meta / patch data tool.
+"""
+版本信息工具。
 
-查询当前版本的强势角色、削弱角色和装备改动信息。
+查询当前游戏版本的 meta 数据：强势角色、削弱角色、装备改动。
+用于角色推荐和出装建议的版本依据。
+数据来源：data/test_data/patch_meta.json。
 """
 
 from __future__ import annotations
@@ -22,11 +25,7 @@ def get_patch_meta(role: str = "damage", patch: str = "latest") -> dict[str, Any
     with DATA_PATH.open("r", encoding="utf-8") as file:
         data = json.load(file)
     role_meta = data["game"][patch]["roles"][role]
-    return {
-        "patch": data["game"][patch]["patch"],
-        "role": role,
-        **role_meta,
-    }
+    return {"patch": data["game"][patch]["patch"], "role": role, **role_meta}
 
 
 @tool
@@ -34,26 +33,27 @@ def patch_meta_tool(
     role: Optional[str] = None,
     patch: str = "latest",
 ) -> dict[str, Any]:
-    """查询当前版本的强势角色和装备改动。
+    """
+    查询当前版本的强势角色和装备改动。
 
     用于结合版本趋势做角色推荐和出装建议。
-    可指定角色位置过滤，不传则返回 damage 位置。
+    可指定角色位置过滤。
 
     Args:
-        role: 角色位置过滤，如 damage、tank、support。不传返回 damage。
+        role: 角色位置过滤，如 damage、tank、support。不传默认 damage。
         patch: 版本号，默认 latest。
 
     Returns:
-        status 为 "ok" 时包含版本号、强势角色列表、装备改动等。
+        status="ok" 时包含 strong_characters、nerfed_characters、buffed_items 等。
     """
     try:
         result = get_patch_meta(role=role or "damage", patch=patch)
         return {"status": "ok", **result}
     except FileNotFoundError:
-        logger.warning("Patch data file not found: %s", DATA_PATH)
-        return {"status": "unavailable", "reason": "Patch data unavailable"}
+        logger.warning("版本数据文件未找到: %s", DATA_PATH)
+        return {"status": "unavailable", "reason": "版本数据暂不可用"}
     except KeyError:
-        return {"status": "unavailable", "reason": f"No patch data for {patch}/{role}"}
+        return {"status": "unavailable", "reason": f"未找到 {patch}/{role} 的版本数据"}
     except Exception:
-        logger.exception("Patch meta query failed")
-        return {"status": "unavailable", "reason": "Query error"}
+        logger.exception("版本数据查询失败")
+        return {"status": "unavailable", "reason": "版本查询异常"}

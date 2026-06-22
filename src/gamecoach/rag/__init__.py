@@ -1,7 +1,7 @@
-"""GameCoach AI RAG 模块。
+"""RAG 模块 — FAISS 向量检索 + DashScope Embedding。
 
-提供攻略文档的加载、索引和检索能力。
-使用 FAISS 向量库 + 本地 embedding 做语义检索。
+提供攻略文档的加载（loader）、索引（indexer）和检索（retriever）能力。
+索引首次构建后持久化到 data/vector_store/，后续秒级加载。
 """
 
 from gamecoach.rag.retriever import retrieve

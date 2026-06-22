@@ -1,6 +1,7 @@
-"""GameCoach AI tools layer.
+"""工具层 — LangChain @tool 封装的游戏数据查询接口。
 
-LangChain @tool wrappers for game data access with LangSmith tracing and graceful degradation.
+所有工具通过 @tool 装饰器注册，支持 LLM tool calling 和 LangSmith 追踪。
+每个工具都有 status 字段区分"正常返回"和"不可用"，防止上层误判。
 """
 
 from gamecoach.tools.guide_rag import guide_rag_tool

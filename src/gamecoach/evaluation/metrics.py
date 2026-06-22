@@ -1,7 +1,15 @@
-"""评估指标计算与 LangSmith 上报。
+"""
+评估指标计算与 LangSmith 上报。
 
-从 GameCoachState 中提取关键质量指标，评估本次 Agent 执行的质量，
-并通过 LangSmith SDK 上报自定义指标（如果 API Key 已配置）。
+从 GameCoachState 提取关键质量指标，评估本次 Agent 执行的质量，
+并通过 LangSmith SDK 上报自定义 feedback（如果 API Key 已配置）。
+
+LangSmith Feedback 指标：
+- planner_task_count: Planner 生成的任务数
+- degraded_nodes: 被降级跳过的节点数
+- rag_hits: RAG 检索到的文档数
+- response_length: 最终回复的字符数
+- health: 综合健康度评分（1.0 = OK, 0.5 = WARN/FAIL）
 """
 
 from __future__ import annotations
@@ -13,14 +21,16 @@ from gamecoach.graph.state import GameCoachState
 
 logger = logging.getLogger(__name__)
 
-# LangSmith client 惰性初始化
+# LangSmith client 惰性初始化 —— 避免模块导入时触发网络连接
 _langsmith_client = None
 
 
 def _get_langsmith_client():
-    """获取 LangSmith client 实例。
+    """
+    获取 LangSmith client 实例（惰性初始化 + 全局缓存）。
 
-    如果 LANGCHAIN_API_KEY 未配置则返回 None，所有上报操作静默跳过。
+    LANGCHAIN_API_KEY 未配置时返回 None —— 所有上报操作静默跳过，
+    不影响正常的 Agent 执行流程。
     """
     global _langsmith_client
     if _langsmith_client is None:
@@ -40,13 +50,21 @@ def _get_langsmith_client():
 
 
 def evaluate_run(state: GameCoachState) -> dict:
-    """计算本次执行的质量评估报告。
+    """
+    计算本次执行的质量评估报告。
+
+    三个评估维度：
+    1. execution: 任务执行情况（计划数/执行数/跳过数/降级数）
+    2. data_quality: 数据完整性（各模块是否有产出）
+    3. output_quality: 输出质量（回复长度）
+
+    Report 计算完成后，尝试上报到 LangSmith（静默失败）。
 
     Args:
-        state: 完整的 GameCoachState。
+        state: 完整的 GameCoachState（DAG 执行完成后）。
 
     Returns:
-        评估报告字典，包含各维度的评分和诊断。
+        评估报告字典。
     """
     metrics = state.get("metrics", {})
     routing = state.get("routing_decisions", {})
@@ -66,7 +84,7 @@ def evaluate_run(state: GameCoachState) -> dict:
         },
         "data_quality": {
             "has_match_data": metrics.get("has_match_analysis", False),
-            "has_hero_recs": metrics.get("has_hero_recommendations", False),
+            "has_character_recs": metrics.get("has_character_recommendations", False),
             "has_build_recs": metrics.get("has_build_recommendations", False),
             "has_training_plan": metrics.get("has_training_plan", False),
             "rag_hits": metrics.get("rag_hit_count", 0),
@@ -77,17 +95,16 @@ def evaluate_run(state: GameCoachState) -> dict:
         "health": _compute_health(planned_count, executed_count, len(errors), len(degraded)),
     }
 
-    # 尝试上报到 LangSmith
-    _push_to_langsmith(report, state)
-
+    _push_to_langsmith(report)
     return report
 
 
-def _push_to_langsmith(report: dict, state: GameCoachState) -> None:
-    """将评估指标上报到 LangSmith。
+def _push_to_langsmith(report: dict) -> None:
+    """
+    将评估指标通过 LangSmith SDK 上报为自定义 feedback。
 
-    通过 LangSmith SDK 创建自定义 feedback，
-    在 LangSmith UI 中可查看每次请求的质量趋势。
+    上报的指标在 LangSmith UI 中可以按时间查看趋势图。
+    所有异常静默捕获 —— 上报失败不影响 Agent 正常执行。
     """
     client = _get_langsmith_client()
     if client is None:
@@ -96,6 +113,7 @@ def _push_to_langsmith(report: dict, state: GameCoachState) -> None:
     project = os.getenv("LANGCHAIN_PROJECT", "gamecoach-ai")
 
     try:
+        # 每个指标通过 create_feedback 单独上报
         client.create_feedback(
             key="planner_task_count",
             score=report["execution"]["planned_tasks"],
@@ -133,12 +151,9 @@ def _push_to_langsmith(report: dict, state: GameCoachState) -> None:
 
 
 def _compute_health(
-    planned: int,
-    executed: int,
-    error_count: int,
-    degraded_count: int,
+    planned: int, executed: int, error_count: int, degraded_count: int,
 ) -> str:
-    """综合评估执行健康度。"""
+    """综合评估执行健康度（分级）。"""
     if error_count > 0:
         return "WARN: 执行中有错误"
     if degraded_count > 2:

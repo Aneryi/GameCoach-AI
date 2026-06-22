@@ -8,9 +8,9 @@
     "damage"
   ],
   "weaknesses": [
+    "Teamfight participation low – improve mid-game rotation timing.",
     "poor teamfight positioning",
     "Win rate below 50% – narrow character pool and reduce high-risk plays.",
-    "Teamfight participation low – improve mid-game rotation timing.",
     "excessive mid-game deaths"
   ],
   "goals": [
@@ -18,5 +18,5 @@
   ],
   "preferred_playstyle": "conservative farming",
   "rank": "Platinum I",
-  "updated_at": "2026-06-22T21:38:19.089598+08:00"
+  "updated_at": "2026-06-22T22:17:00.198976+08:00"
 }
